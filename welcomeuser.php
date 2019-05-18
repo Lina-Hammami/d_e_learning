@@ -1,53 +1,35 @@
 <?php
 require("header.php");
+require("sessExpired.php");
+require("functions.php");
 ?>
 
 <!Doctype html>
 <body>
 
 <?php
-	echo "<h3> Welcome ".$_SESSION['nom']."<br>You have ".$_SESSION['score'].
-	" /100 pts in the ".$_SESSION['currentLevel']." level </h3>";
-	$still = 96 - $_SESSION['score'];
-	echo " You still have to gain at least more ".$still." points to pass this level<br> ";
+	echo "<h3> Salut ".$_SESSION['nom']." ".$_SESSION['prenom']." ^^ <br>Vous avez ".array_sum($_SESSION['tests']).
+	" /100 pts dans le test de niveau ".$_SESSION['currentLevel']." ".getDescriptionLevel($_SESSION['currentLevel'])." </h3>";
+	$still = 96 - array_sum($_SESSION['tests']);
+	echo " Vous devez encore gagner au moins plus que ".$still." points pour réussir ce test de niveau<br> ";
 	
-	echo "<br> List of next Levels : ";
+	echo "<br> Liste des prochains niveaux: ";
 	echo "<ul>";
 		printNextLevels($_SESSION['levels']);
 	echo "</ul>";
 
-	echo "<br> List of done Levels : ";
+	echo "<br> Liste des niveaux passés : ";
 	echo "<ul>";
 		printDoneLevels($_SESSION['levels']);
 	echo "</ul>";
-
-
-
 ?>
-<!--
-<ul>
-	<li><a href="niveau.php?var=''">A1 BEGINNER</a>
-	</li>
-	<li><a href="niveau.php?var='A1'">A2 ELEMENTARY</a>
-	</li>
-	<li><a href="niveau.php?var='A1'">B1 INTERMEDIATE</a>
-	</li>
-	<li><a href="niveau.php?var='A1'">B2 UPPER INTERMEDIATE</a>
-	</li>
-	<li><a href="niveau.php?var='A1'">C1 ADVANCED</a>
-	</li>
-	<li><a href="niveau.php?var='A1'">C2 PROFICIENT</a>
-	</li>
-</ul>
-<br>
--->
 
 <form method="post" action="welcomeuser.php">
-	<button type="submit" class="btn" value="nl" name="nextlevel">nl</button>
+	<button type="submit" class="btn" value="nl" name="nextlevel">Prochain test de niveau </button>
 </form>
 
 <form method="post" action="welcomeuser.php">
-	<input type="submit" name="disconnect" value="Disconnect"  />
+	<input type="submit" name="disconnect" value="Déconnecter"  />
 </form>
 
 
@@ -60,24 +42,18 @@ require("header.php");
 	}
 
 	if(isset($_POST['disconnect'])){
-		disconnect();
+		deconnecter();
 	}
 
 	function nextLevel(){
-		var_dump(key($_SESSION['levels']));
-		
-	}
+		header("Location: http://localhost/proj2/".$_SESSION['currentLevel']."_comprehension.php ");
 
-	function disconnect(){
-		//TO_DO : - store the session values into database
-		//		  - clear session
-		//        - disconnect database		 
 	}
 
 	function printNextLevels($levels){
 		foreach ($levels as $key_level => $value_level) {
-			if(($value_level != (-1))&&($key_level != $_SESSION['currentLevel'])){
-				echo "<li>".$key_level."</li>";
+			if(($value_level != (-1))){
+				echo "<li><b>".$key_level."</b> ".getDescriptionLevel($key_level)."</li>";
 			}
 		}
 	}
@@ -85,14 +61,8 @@ require("header.php");
 	function printDoneLevels($levels){
 		foreach ($levels as $key_level => $value_level) {
 			if($value_level == (-1)){
-				echo "<li>".$key_level."</li>";
+				echo "<li><b>".$key_level."</b> ".getDescriptionLevel($key_level)."</li>";
 			}
 		}
-	}
-	
-	function changeCurrentLevelPosition(){
-		//set array pointer to the current level position
-				while (key($_SESSION['levels']) !== $_SESSION['currentLevel'])
-				 next($_SESSION['levels']);
 	}
 ?>

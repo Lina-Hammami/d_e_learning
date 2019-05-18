@@ -1,5 +1,7 @@
 <?php
-require("header.php");?>
+require("header.php");
+require("functions.php");
+?>
 
 <!Doctype html>
 
@@ -91,41 +93,10 @@ require("header.php");?>
 
 <?php
 
-function enregistrerUtilisateur()
-{	
-	include("db_param.php");
-	$idCon = mysqli_connect(MYHOST, MYUSER, MYPASS, MYDATABASE);
-	
-	if(!$idCon){
-		die("Impossible de se connecter au serveur de la base de données");
-	}
-	else{
-		$Nom = $_POST['Nom'];
-	    $Prenom = $_POST['Prenom'];
-	    $Sexe = $_POST['Sexe'];
-	    $Telephone = $_POST['Telephone'];
-	    $Pays = $_POST['Pays'];
-	    $Age = $_POST['Age'];
-	    $Email = $_POST['Email'];
-	    $Password = $_POST['mdp1'];
-
-
-	    $sql  =  "INSERT INTO utilisateurs (nom, prenom, sexe, telephone, pays, age, email, password) 
-  			  VALUES('".$Nom."', '".$Prenom."', '".$Sexe."', '".$Telephone."', '".$Pays."', '".$Age."', '".$Email."', '".$Password."')";
-
-	    if( mysqli_query($idCon,$sql) ) {
-	        echo "Utilisateur ajouté avec succès";
-	        header("Location: http://localhost/proj2/connexion.php?email=".$Email."&password=".$Password."");
-	    }
-	    else{
-	    	die("Erreur lors de l'ajout");
-	    }
-	}
-}
 
 if(isset($_POST['submit']))
 {
-   enregistrerUtilisateur();
+   newUser();
 } 
 
 ?>
