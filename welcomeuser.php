@@ -46,7 +46,14 @@ require("functions.php");
 	}
 
 	function nextLevel(){
-		header("Location: http://localhost/proj2/".$_SESSION['currentLevel']."_comprehension.php ");
+
+		$_SESSION['score'] = array_sum($_SESSION['tests']);
+	 	if ((failedTest()== false) && ($_SESSION['score'] >=96)){
+	 		header("Location: http://localhost/proj2/successTest.php"); 		
+	 	}else{
+
+			header("Location: http://localhost/proj2/".$_SESSION['currentLevel']."_comprehension.php ");
+	 	}
 
 	}
 

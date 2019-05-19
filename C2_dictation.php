@@ -54,7 +54,11 @@
 
 </body>
 <?php
- function validateTest($s){
+
+/*
+  *	send us to successTest page if the level test is good else fail test
+  */
+  function validateTest($s){
 
  	$_SESSION['tests']['dictation']= $s;
  	$_SESSION['score'] = array_sum($_SESSION['tests']);
@@ -65,7 +69,6 @@
  	}
 
  }
-
 if(isset($_POST['submit']))
 {
 	if((isset($_POST['question1'])) && (isset($_POST['question2']))  && (isset($_POST['question3']))  && (isset($_POST['question4']))  && (isset($_POST['question5'])) ){ 

@@ -42,7 +42,7 @@ function newUser()
 **/
 function getCurrentLevel($levels){
 	foreach ($levels as $key_level => $value_level) {
-		if(($value_level != (-1))&&($value_level != Null)){
+		if(!($value_level == (-1)) && !($value_level === 999)){
 			return $key_level;
 		}
 	}
@@ -134,6 +134,7 @@ function sumTest($q1, $q2, $q3, $q4, $q5){
  	return $sum;
  }
 
+
 /*
 * return true if one of the tests (comprehension, grammar, listening, dictation)
 * have value < 24
@@ -154,6 +155,7 @@ function failedTest(){
 *  then redirect to connexion page
 **/
 function deconnecter(){
+	echo "disconnecting";
 	//TO_DO : - store the session values : tests into database
 	mysqli_close($idCon);
 	session_destroy();
@@ -191,24 +193,47 @@ function removeUser(){
 /*
 *	Reset value 
 */
-function resetTest($key, $val){
-	$val = 0;
+function resetTest($val, $key){
+	$_SESSION['tests'][$key] = 0;
 } 
 
+/*
+*	update a user
+*/
 function updateRecord(){
-	$_SESSION['currentLevel'] = getCurrentLevel($_SESSION['levels']);
-		//effectue reset sur chaque element du tableau
-		array_walk($_SESSION['tests'], 'resetTest');
-	$req = "UPDATE utilisateurs SET 
-		  A1=".$_SESSION['levels']['A1'].
-		",A2= ".$_SESSION['levels']['A2'].
-		",B1= ".$_SESSION['levels']['B1'].
-		",B2= ".$_SESSION['levels']['B2'].
-		",C1= ".$_SESSION['levels']['C1'].
-		",C2= ".$_SESSION['levels']['C2'].
-		"WHERE id='".$_SESSION["user_id"]."'";
-	mysqli_query($idCon,$req); 
+	include("db_param.php");
+	$idCon = mysqli_connect(MYHOST, MYUSER, MYPASS, MYDATABASE);
+	
+	if(!$idCon){
+		die("Impossible de se connecter au serveur de la base de données");
+	}
+	else{
+		$_SESSION['currentLevel'] = getCurrentLevel($_SESSION['levels']);
 
+		$sql = "UPDATE utilisateurs SET 
+			  A1=".$_SESSION['levels']['A1'].
+			",A2= ".$_SESSION['levels']['A2'].
+			",B1= ".$_SESSION['levels']['B1'].
+			",B2= ".$_SESSION['levels']['B2'].
+			",C1= ".$_SESSION['levels']['C1'].
+			",C2= ".$_SESSION['levels']['C2'].
+			",comprehension= ".$_SESSION['tests']['comprehension'].
+			",grammar= ".$_SESSION['tests']['grammar'].
+			",listening= ".$_SESSION['tests']['listening'].
+			",dictation= ".$_SESSION['tests']['dictation'].
+			" WHERE id='".$_SESSION["user_id"]."'";
+
+
+		//var_dump($_SESSION['levels']);
+		//echo"<br> $sql ";exit;
+
+		if( mysqli_query($idCon,$sql) ) {
+			header("Location: http://localhost/proj2/welcomeuser.php");
+		}else{
+			die("not updated");
+		}
+	}
+	
 }
 
 /*
@@ -216,45 +241,51 @@ function updateRecord(){
 *	
 */
 function passedLevel(){
-	
-	if($_SESSION['currentLevel']=="A1"){
 
-		$_SESSION['levels']['A1'] = -1;
-		$_SESSION['levels']['A2'] = 0;
-		updateRecord();
-
-	}
-	if($_SESSION['currentLevel']=="A2"){
-		
-		$_SESSION['levels']['A2'] = -1;
-		$_SESSION['levels']['B1'] = 0;
-		updateRecord();
-
-	}
-	if($_SESSION['currentLevel']=="B1"){
-
-		$_SESSION['levels']['B1'] = -1;
-		$_SESSION['levels']['B2'] = 0;
-		updateRecord();
-		
-	}
-	if($_SESSION['currentLevel']=="B2"){
-		
-		$_SESSION['levels']['B2'] = -1;
-		$_SESSION['levels']['C1'] = 0;
-		updateRecord();	
-	}
-	if($_SESSION['currentLevel']=="C1"){
-		
-		$_SESSION['levels']['C1'] = -1;
-		$_SESSION['levels']['C2'] = 0;
-		updateRecord();
-	}
 	if($_SESSION['currentLevel']=="C2"){
 		//if last level delete user and disconnect 
 		removeUser();
 		echo "<script>alert(\"Congratulations ! You master english language now :D !! \");</script>";
 		deconnecter();
+	}
+	elseif($_SESSION['currentLevel']=="C1"){
+		
+		$_SESSION['levels']['C1'] = -1;
+		$_SESSION['levels']['C2'] = 0;
+		array_walk($_SESSION['tests'], 'resetTest');
+		updateRecord();
+	}
+	elseif($_SESSION['currentLevel']=="B2"){
+		
+		$_SESSION['levels']['B2'] = -1;
+		$_SESSION['levels']['C1'] = 0;
+		array_walk($_SESSION['tests'], 'resetTest');
+		updateRecord();	
+	}
+	elseif($_SESSION['currentLevel']=="B1"){
+
+		$_SESSION['levels']['B1'] = -1;
+		$_SESSION['levels']['B2'] = 0;
+		array_walk($_SESSION['tests'], 'resetTest');
+		updateRecord();
+		
+	}
+	elseif($_SESSION['currentLevel']=="A2"){
+		var_dump($_SESSION['currentLevel']);
+
+		$_SESSION['levels']['A2'] = -1;
+		$_SESSION['levels']['B1'] = 0;
+		array_walk($_SESSION['tests'], 'resetTest');
+		updateRecord();
+
+	}
+	elseif($_SESSION['currentLevel']=="A1"){
+
+		$_SESSION['levels']['A1'] = -1;
+		$_SESSION['levels']['A2'] = 0;
+		//effectue resetTest sur chaque element du tableau
+		array_walk($_SESSION['tests'], 'resetTest');
+		updateRecord();
 	}
 }
 

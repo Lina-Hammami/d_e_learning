@@ -2,6 +2,11 @@
 require("header.php");
 require("sessExpired.php");
 require("functions.php");
+
+if (!(failedTest()) && !($_SESSION['score'] < 96)){
+	header("Location: http://localhost/proj2/successTest.php"); 		
+}
+
 ?>
 
 <!Doctype html>

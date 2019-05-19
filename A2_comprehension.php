@@ -53,6 +53,7 @@
 
 </body>
 <?php
+
  function validateTest($s)
  {
 	$_SESSION['tests']["comprehension"] = $s;
